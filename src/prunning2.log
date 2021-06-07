@@ -1,0 +1,3 @@
+Run command: ./tree_pruner.py ../data/mulal_gisaid_2021-01-22.filtered.twice.fasta.tre ../data/mulal_gisaid_2021-01-22.filtered.twice.fasta.tre.pruned
+54568 nodes in pruned tree after umbreallas deletion and 2 iterations of random bifurcations deletion
+Job done.

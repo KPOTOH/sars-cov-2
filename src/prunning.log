@@ -1,0 +1,3 @@
+Run command: ./tree_pruner.py ../data/mulal_gisaid_2021-01-22.filtered.fasta.tre ../data/mulal_gisaid_2021-01-22.filtered.fasta.tre.pruned
+50490 nodes in pruned tree after metelki deletion and 2 iterations of random bifurcations deletion
+Job done.
