@@ -1,3 +1,0 @@
-id	name	regionFile
-elem1	Elements 1	Elements_regions.bed
-control	Controls	Controls_regions.bed

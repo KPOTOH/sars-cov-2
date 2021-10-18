@@ -1,3 +1,0 @@
-id	name	elem1	control
-ftr0	subst_count_	subst_count__elements.txt	subst_count__control.txt
-ftr1	distance1	distance1_elements.txt	distance1_control.txt
