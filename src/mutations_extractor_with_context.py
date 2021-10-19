@@ -86,7 +86,7 @@ def extract_context(seq, pos):
     center = seq[pos].upper()
     suffix = seq[pos+1: pos+3].lower()
     context = prefix + center + suffix
-    return context
+    return str(context)
 
 
 def release_mutations_from_two_seqs(parent_seq: str, child_seq: str):
