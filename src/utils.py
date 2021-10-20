@@ -106,6 +106,17 @@ def release_mutations_from_two_seqs(parent_seq: str, child_seq: str):
     return mutations
 
 
+def count_two_seqs_diff(parent_seq: str, child_seq: str):
+    start_pos, stop_pos = trim_two_seqs(parent_seq, child_seq)
+    diff = 0
+    for pos in range(start_pos, stop_pos):
+        sourse_nucl = parent_seq[pos]
+        mutant_nucl = child_seq[pos]
+        if sourse_nucl != mutant_nucl:
+            diff += 1
+    return diff
+
+
 def dict_from_pairs(pairs: list):
     """there is a list of pairs, that will be converted to
     dict, where each element of pair is key and value at the same time:

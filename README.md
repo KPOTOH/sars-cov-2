@@ -1,3 +1,12 @@
+# Run pipeline (required python3.9)
+```
+cd sars-cov-2
+pip install -r requirements.txt
+pip install -e .
+```
+
+
+
 ## Краткое описание работы
 
 1. Выкачали Gisaid, только "качественное". Отфильтровали тех, что содержат что-либо кроме "ATGC". Получилось около 176 тыс. ковидов
