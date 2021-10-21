@@ -1,0 +1,25 @@
+version: 1
+formatters:
+  simple:
+    class: logging.Formatter
+    format: "%(asctime)s %(name)s %(levelname)s %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+handlers:
+  full_file_handler:
+    class: logging.FileHandler
+    filename: process.log
+    level: DEBUG
+    formatter: simple
+  warn_file_handler:
+    class: logging.FileHandler
+    filename: process.warn
+    level: WARN
+    formatter: simple
+loggers:
+  pipeline:
+    level: DEBUG
+    handlers: [full_file_handler]
+    propagate: yes
+root:
+  level: DEBUG
+  handlers: [warn_file_handler]

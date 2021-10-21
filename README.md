@@ -1,7 +1,9 @@
-# Run pipeline (required python3.9)
+# Activate environment (required python3.9)
 ```
 cd sars-cov-2
-pip install -r requirements.txt
+python -m venv env
+source env/bin/activate
+pip install -r requirements.txt  # optional
 pip install -e .
 ```
 

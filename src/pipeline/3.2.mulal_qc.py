@@ -9,7 +9,7 @@ from tqdm import tqdm
 from src.utils import count_two_seqs_diff
 
 PATH_TO_MULAL_IN = "./data/mulal.fasta"
-PATH_TO_MULAL_OUT = "./data/mulal.filtered.fasta"
+# PATH_TO_MULAL_OUT = "./data/mulal.filtered.fasta"
 MAX_MUT_NUM = 80
 DROP_PROB = 0.6
 NSEQS = 1139387 # number of records in input fasta
@@ -56,11 +56,13 @@ def fasta_writer(seqs, handle):
 
 
 @click.command("qc")
-@click.option("--inpath", default=PATH_TO_MULAL_IN, help="path to input mulal fasta")
-@click.option("--outpath", default=PATH_TO_MULAL_OUT, help="path to output mulal fasta")
+@click.option("--inpath", help="path to input mulal fasta")
+@click.option("--outpath", default=None, help="path to output mulal fasta, default: base(inpath).filtered.fasta")
 @click.option("--max-mut", default=MAX_MUT_NUM, help="maximum allovable num of mutations")
 @click.option("--drop-prob", default=DROP_PROB, help="probability to drop random sequence")
 def main(inpath: str, outpath: str, max_mut: int, drop_prob: float):
+    outpath = outpath or inpath.replace("fasta", "filtered.fasta")
+
     filtered_seqs = mulal_filtrator(inpath, max_mut, drop_prob)
     print(type(filtered_seqs))
     fasta_writer(filtered_seqs, outpath)
