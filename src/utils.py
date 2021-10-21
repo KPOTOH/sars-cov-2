@@ -91,6 +91,9 @@ def extract_context(seq, pos):
 
 
 def release_mutations_from_two_seqs(parent_seq: str, child_seq: str):
+    assert isinstance(parent_seq, str) and isinstance(child_seq, str), (
+        "input strings must be str-type"
+    )
     start_pos, stop_pos = trim_two_seqs(parent_seq, child_seq)
 
     mutations = []

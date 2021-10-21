@@ -21,7 +21,7 @@ def get_mut_num(rec: SeqRecord, ref: SeqRecord) -> int:
     return mut_num
 
 
-def mulal_filtrator(inpath: str, max_mut: int, drop_prob: float):
+def mulal_filtrator(inpath: str, max_mut: int, drop_prob: float) -> SeqRecord:
     """
     generator of filtered records
 
