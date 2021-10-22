@@ -11,7 +11,7 @@ from src.utils import count_two_seqs_diff
 PATH_TO_MULAL_IN = "./data/mulal.fasta"
 # PATH_TO_MULAL_OUT = "./data/mulal.filtered.fasta"
 MAX_MUT_NUM = 80
-DROP_PROB = 0.6
+DROP_PROB = 0.82
 NSEQS = 1139387 # number of records in input fasta
 
 
@@ -36,10 +36,11 @@ def mulal_filtrator(inpath: str, max_mut: int, drop_prob: float) -> SeqRecord:
     ref = next(reader)
 
     for rec in tqdm(reader, total=NSEQS):
+        if random.random() < drop_prob:
+            continue
+        
         mut_num = get_mut_num(rec, ref)
         if mut_num > max_mut:
-            continue
-        if random.random() < drop_prob:
             continue
 
         yield rec
@@ -62,9 +63,7 @@ def fasta_writer(seqs, handle):
 @click.option("--drop-prob", default=DROP_PROB, help="probability to drop random sequence")
 def main(inpath: str, outpath: str, max_mut: int, drop_prob: float):
     outpath = outpath or inpath.replace("fasta", "filtered.fasta")
-
     filtered_seqs = mulal_filtrator(inpath, max_mut, drop_prob)
-    print(type(filtered_seqs))
     fasta_writer(filtered_seqs, outpath)
 
 

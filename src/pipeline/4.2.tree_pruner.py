@@ -6,6 +6,7 @@
 """
 
 from random import randint
+import logging
 import sys
 
 import click
