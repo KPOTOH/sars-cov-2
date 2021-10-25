@@ -86,9 +86,13 @@ def save_mutations_to_df(mutations: list, path: str):
     df.to_csv(path, index=None)
 
 
-@click.command("extractor", help="extract mutations from phylognenetic tree and dump it to json")
+@click.command(
+    "extractor", 
+    help="extract mutations from phylognenetic tree and dump it to json;  "
+         "run script after prank completion, i.e. after ancestors reconstruction"
+)
 @click.option("--tree", required=True, help="path to tree in newick format")
-@click.option("--fasta", required=True, help="path to fasta file, containing every tree node sequence")
+@click.option("--fasta", required=True, help="path to fasta, containing every tree node sequence")
 @click.option("--out-csv", required=True, help="path to output csv")
 @click.option("--out-json", default=None, help="path to output json")
 def extract_mutations(tree: str, fasta: str, out_csv: str, out_json: str):
