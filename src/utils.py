@@ -5,6 +5,7 @@ import logging.config
 from queue import Queue
 import sys
 import time
+from typing import Tuple
 
 import numpy as np
 import networkx as nx
@@ -49,22 +50,38 @@ def read_fasta_generator(filepath: str):
         yield header, seq
 
 
-fasta_generator = read_fasta_generator(FASTA_PATH)
-fasta_storage = dict()
+# def get_sequence(node_name: str) -> str:
+#     """read fasta file online and write seqs to dict if another one are needed"""
+#     if node_name in fasta_storage:
+#         seq = fasta_storage[node_name]
+#         return seq
+
+#     for new_node_name, new_seq in fasta_generator:
+#         new_node_name = new_node_name.strip(">\n")
+#         new_seq = new_seq.replace("\n", "")
+#         fasta_storage[new_node_name] = new_seq
+#         if new_node_name == node_name:
+#             return new_seq
 
 
-def get_sequence(node_name: str) -> str:
-    """read fasta file online and write seqs to dict if another one are needed"""
-    if node_name in fasta_storage:
-        seq = fasta_storage[node_name]
-        return seq
+class FastaStorage:
+    def __init__(self, path_to_fasta: str):
+        self.path_to_fasta = path_to_fasta
+        self.fasta_generator = read_fasta_generator(path_to_fasta)
+        self.fasta_storage = dict()
+    
+    def get_sequence(self, node_name: str) -> str:
+        """read fasta file online and write seqs to dict if another one are needed"""
+        if node_name in self.fasta_storage:
+            seq = self.fasta_storage[node_name]
+            return seq
 
-    for new_node_name, new_seq in fasta_generator:
-        new_node_name = new_node_name.strip(">\n")
-        new_seq = new_seq.replace("\n", "")
-        fasta_storage[new_node_name] = new_seq
-        if new_node_name == node_name:
-            return new_seq
+        for new_node_name, new_seq in self.fasta_generator:
+            new_node_name = new_node_name.strip(">\n")
+            new_seq = new_seq.replace("\n", "")
+            self.fasta_storage[new_node_name] = new_seq
+            if new_node_name == node_name:
+                return new_seq
 
 
 def node_parent(node):
@@ -74,7 +91,7 @@ def node_parent(node):
         return None
 
 
-def trim_two_seqs(seq1, seq2):
+def trim_two_seqs(seq1: str, seq2: str) -> Tuple[int]:
     """there are '------' in the start and end of seqs. Drop it!"""
     n = len(seq1)
     start_pos, stop_pos = 0, n
@@ -89,7 +106,7 @@ def trim_two_seqs(seq1, seq2):
     return start_pos, stop_pos
 
 
-def extract_context(seq, pos):
+def extract_context(seq: str, pos: int) -> str:
     """ extract context from given seq around pos (2 nucl)
 
     if seq = "ATCGACT" and pos = 3, return "tcGac"
@@ -101,7 +118,7 @@ def extract_context(seq, pos):
     return context
 
 
-def release_mutations_from_two_seqs(parent_seq: str, child_seq: str):
+def release_mutations_from_two_seqs(parent_seq: str, child_seq: str) -> list:
     assert isinstance(parent_seq, str) and isinstance(child_seq, str), (
         "input strings must be str-type"
     )

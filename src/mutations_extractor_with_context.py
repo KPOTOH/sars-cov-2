@@ -15,103 +15,20 @@ import os
 from queue import Queue
 import sys
 
+import click
 from ete3 import PhyloTree
+import pandas as pd
 
-PRANK_OUTPUT_PATH = "../data/mulal_gisaid_2021-01-22.filtered.twice.fasta.prank.anc"
-TREE_PATH = PRANK_OUTPUT_PATH + ".dnd"
-FASTA_PATH = PRANK_OUTPUT_PATH + ".fas"
-
-MUTATION_STORAGE_PATH = '../data/overall_mutations_with_context2.json'
+from src.utils import node_parent, FastaStorage, release_mutations_from_two_seqs
 
 
-def read_fasta_generator(filepath: str):
-    """read fasta without deleting '\n' from line ends to write that
-    in the next step
-    """
-    with open(filepath) as fin:
-        seq = ''
-        for line in fin:
-            if line.startswith(">"):
-                if seq != '':
-                    yield header, seq
-                header = line
-                seq = ''
-            else:
-                seq += line
-        yield header, seq
-
-
-def get_sequence(node_name: str) -> str:
-    """read fasta file online and write seqs to dict if another one are needed"""
-    if node_name in fasta_storage:
-        seq = fasta_storage[node_name]
-        return seq
-
-    for new_node_name, new_seq in fasta_generator:
-        new_node_name = new_node_name.strip(">\n")
-        new_seq = new_seq.replace("\n", "")
-        fasta_storage[new_node_name] = new_seq
-        if new_node_name == node_name:
-            return new_seq
-
-
-def node_parent(node):
-    try:
-        return next(node.iter_ancestors())
-    except BaseException:
-        return None
-
-
-def trim_two_seqs(seq1, seq2):
-    """there are '------' in the start and end of seqs. Drop it!"""
-    n = len(seq1)
-    start_pos, stop_pos = 0, n
-    for start_pos in range(n):
-        if not (seq1[start_pos] == '-' or seq2[start_pos] == "-"):
-            break
-
-    for stop_pos in range(n - 1, -1, -1):
-        if not (seq1[stop_pos] == '-' or seq2[stop_pos] == "-"):
-            break
-    stop_pos += 1
-    return start_pos, stop_pos
-
-
-def extract_context(seq, pos):
-    """ extract context from given seq around pos (2 nucl)
-    
-    if seq = "ATCGACT" and pos = 3, return "tcGac"
-    """
-    prefix = seq[pos-2: pos].lower()
-    center = seq[pos].upper()
-    suffix = seq[pos+1: pos+3].lower()
-    context = prefix + center + suffix
-    return str(context)
-
-
-def release_mutations_from_two_seqs(parent_seq: str, child_seq: str):
-    start_pos, stop_pos = trim_two_seqs(parent_seq, child_seq)
-
-    mutations = []
-    for pos in range(start_pos, stop_pos):
-        sourse_nucl = parent_seq[pos]
-        mutant_nucl = child_seq[pos]
-        if sourse_nucl != mutant_nucl:
-            sourse_context = extract_context(parent_seq, pos)
-            mutant_context = extract_context(child_seq, pos)
-            mutations.append((
-                pos, sourse_nucl, mutant_nucl, sourse_context, mutant_context
-            ))
-    return mutations
-
-
-def get_mutations(node):
+def get_mutations(node, stor: FastaStorage) -> tuple:
     parent = node_parent(node)
     if parent is None:
         print("WoW", file=sys.stderr)
         return
-    seq_of_parent = get_sequence(parent.name)
-    seq_of_child = get_sequence(node.name)
+    seq_of_parent = stor.get_sequence(parent.name)
+    seq_of_child = stor.get_sequence(node.name)
     assert len(seq_of_child) == len(seq_of_parent), (
         "parent and child seq lenghts aren't equal"
     )
@@ -122,7 +39,7 @@ def get_mutations(node):
     return parent.name, node.name, mutations
 
 
-def bfs_to_extract_mutspec(path_to_tree):
+def bfs_to_extract_mutspec(path_to_tree: str, stor: FastaStorage) -> list:
     """ BFS for extraction """
     tree = PhyloTree(path_to_tree, format=1)
     print("tree readed", file=sys.stderr)
@@ -141,22 +58,46 @@ def bfs_to_extract_mutspec(path_to_tree):
             discovered_nodes.add(cur_node.name)
 
             # main process starts here
-            cur_mutations_of_one = get_mutations(cur_node)
+            cur_mutations_of_one = get_mutations(cur_node, stor)
             overall_mutations.append(cur_mutations_of_one)
     print(
         f"n_discovered_nodes: {len(discovered_nodes)}, "
         f"n_overall_mutations: {len(overall_mutations)}",
         file=sys.stderr
     )
-
     return overall_mutations
 
 
-fasta_generator = read_fasta_generator(FASTA_PATH)
-fasta_storage = dict()
+def save_mutations_to_json(mutations: list, path: str):
+    with open(path, 'w') as fout:
+        json.dump(overall_mutations, fout)
+
+
+def save_mutations_to_df(mutations: list, path: str):
+    mut_collection = []
+    for parent, child, pair_substs in mutations:
+        for pos, src_nucl, mut_nucl, src_context, mut_context in pair_substs:
+            mut_collection.append((
+                pos, src_nucl, mut_nucl, src_context, mut_context, parent, child
+            ))
+    cols = ["pos", "parent_nucl", "child_nucl", "parent_nucl_context", 
+            "child_nucl_context", "parent_node", "child_node"]
+    df = pd.DataFrame(mut_collection, columns=cols)
+    df.to_csv(path, index=None)
+
+
+@click.command("extractor", help="extract mutations from phylognenetic tree and dump it to json")
+@click.option("--tree", required=True, help="path to tree in newick format")
+@click.option("--fasta", required=True, help="path to fasta file, containing every tree node sequence")
+@click.option("--out-csv", required=True, help="path to output csv")
+@click.option("--out-json", default=None, help="path to output json")
+def extract_mutations(tree: str, fasta: str, out_csv: str, out_json: str):
+    stor = FastaStorage(fasta)
+    mutations = bfs_to_extract_mutspec(tree, stor)
+    save_mutations_to_df(mutations, out_csv)
+    if out_json is not None:
+         save_mutations_to_json(mutations, out_json)
+
 
 if __name__ == '__main__':
-    overall_mutations = bfs_to_extract_mutspec(TREE_PATH)
-
-    with open(MUTATION_STORAGE_PATH, 'w') as fout:
-        json.dump(overall_mutations, fout)
+    extract_mutations()

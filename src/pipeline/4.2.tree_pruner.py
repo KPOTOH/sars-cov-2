@@ -18,14 +18,11 @@ DEFAULT_TREE_FORMAT = 1
 MAX_TREE_LEN = 55_000
 APPLICATION_NAME = "pipeline"
 
-logger = logging.getLogger(APPLICATION_NAME)
 
-
-def umbreallas2singles(tree: PhyloTree) -> PhyloTree:
+def umbreallas2singles(tree: PhyloTree):
     """delete all umbreallas; automatically resolve polytomies
     (maybe not in other cases)
     """
-    tree = tree.copy()
     leaves = tree.get_leaves()
     leaves_parents = set(map(node_parent, leaves))
 
@@ -45,7 +42,6 @@ def umbreallas2singles(tree: PhyloTree) -> PhyloTree:
                 leaf.delete(preserve_branch_length=True)
             else:
                 accounted_dists.add(d)
-    return tree
 
 
 def is_approx_equal(n1, n2):
@@ -100,7 +96,8 @@ def random_deletion_in_bifurcations(tree: PhyloTree):
 
 def pruning(path_to_newick: str, max_tree_len=MAX_TREE_LEN, frmt=DEFAULT_TREE_FORMAT):
     tree = PhyloTree(path_to_newick, format=frmt)
-    tree = umbreallas2singles(tree)
+    umbreallas2singles(tree)
+    print("Umbrellas resolved")
     i = 0
     while len(tree) > max_tree_len:
         i += 1
@@ -112,21 +109,21 @@ def pruning(path_to_newick: str, max_tree_len=MAX_TREE_LEN, frmt=DEFAULT_TREE_FO
 
 
 
-@click.command("pruner", help="resolve 'umbrellas' and prune tree to contain less than {MAX_TREE_LEN} nodes")
-@click.option("--inpath", help="path to tree in newick format")
+@click.command("pruner", help="resolve 'umbrellas' and prune tree to contain less than `max-tree-len` nodes")
+@click.option("--inpath", required=True, help="path to tree in newick format")
 @click.option("--outpath", default=None, help="path to output newick, default: `inpath`.pruned")
-@click.option("--max-tree-len", default=MAX_TREE_LEN, help="max allowed tree lenght after prunning")
+@click.option("--max-tree-len", default=MAX_TREE_LEN, show_default=True, help="max allowed tree lenght after prunning")
 def main(inpath: str, outpath: str, max_tree_len: int):
     outpath = outpath or f"{inpath}.pruned"
 
     print(f"Run command: ./tree_pruner.py {inpath} {outpath}\n")
     pruned_tree, n_iterations = pruning(inpath, max_tree_len=max_tree_len)
     print(
-        f"{len(pruned_tree)} nodes in pruned tree after umbreallas deletion "
+        f"{len(pruned_tree)} leaves in pruned tree after umbreallas deletion "
         f"and {n_iterations} iterations of random bifurcations deletion\n"
     )
     pruned_tree.write(outfile=outpath, format=DEFAULT_TREE_FORMAT)
-    print("Job done.\n")
+    print("Prunned tree wrote done.\n")
 
 
 if __name__ == "__main__":
