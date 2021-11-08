@@ -70,7 +70,7 @@ def bfs_to_extract_mutspec(path_to_tree: str, stor: FastaStorage) -> list:
 
 def save_mutations_to_json(mutations: list, path: str):
     with open(path, 'w') as fout:
-        json.dump(overall_mutations, fout)
+        json.dump(mutations, fout)
 
 
 def save_mutations_to_df(mutations: list, path: str):
