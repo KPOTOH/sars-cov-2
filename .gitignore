@@ -3,9 +3,6 @@ data/*
 src/parser/access_file.txt
 src/parser/chromedriver
 src/mulal_pipeline.sif
-nb/*
-!nb/1.mulal_qc.ipynb
-!nb/0.clean_metadata.ipynb
 env
 *.ipynb_checkpoints
 sars_processing.egg-info

@@ -12,9 +12,8 @@ def read_tree(path: str, frmt=1) -> PhyloTree:
     return tree
 
 
-def add_dist2terminals(substitutions: pd.DataFrame, tree_path: str):
-    """ запускать, только если нужно пересчитать уровни для замещений """
-    tree = read_tree(tree_path)
+def _add_dist2terminals(substitutions: pd.DataFrame, tree: PhyloTree):
+    """ говно тупого говна """
     edge_levels = dict()
 
     for leaf in tqdm.tqdm(tree.iter_leaves(), total=55000):
@@ -37,31 +36,33 @@ def add_dist2terminals(substitutions: pd.DataFrame, tree_path: str):
     return substitutions
 
 
-def add_dist2root(substitutions: pd.DataFrame, tree_path: str):
-    """ запускать, только если нужно пересчитать уровни для замещений """
-    tree = read_tree(tree_path)
-    dist = dict()
-    q = Queue()
-    dist[tree.name] = 0
-    for child in tree.children:
-        q.put(child)
+def add_dist2root(substitutions: pd.DataFrame, tree: PhyloTree) -> pd.DataFrame:
+    """ 
+    calculate distance to root from each node and assign to mutations in table;
+    mutation has distance of child node of edge
+    """
+    phylo_dist = dict()
+    topology_dist = dict()
+    phylo_dist[tree.name] = 0
+    topology_dist[tree.name] = 0
 
-    while not q.empty():
-        node: PhyloTree = q.get()
-        dist[node.name] = dist[node_parent(node).name] + 1
-        for child in node.children:
-            q.put(child)
+    for node in tqdm.tqdm(tree.iter_descendants(), total=len(tree.get_descendants())):
+        pd = tree.get_distance(node)
+        td = int(tree.get_distance(node, topology_only=True))
+       
+        phylo_dist[node.name] = pd
+        topology_dist[node.name] = td
 
-    assert len(dist) == len(tree.get_descendants())  # E = V - 1
+    assert len(phylo_dist) == len(tree.get_descendants()) + 1
+    assert len(topology_dist) == len(tree.get_descendants()) + 1
 
-    # substitutions = substitutions.copy()
-    # substitutions['edge_level'] = substitutions.apply(
-    #     lambda r: edge_levels[(r.parent_node, r.child_node)], axis=1)
-
+    substitutions = substitutions.copy()
+    substitutions['phylo_dist'] = substitutions.child_node.map(phylo_dist)
+    substitutions['topology_dist'] = substitutions.child_node.map(topology_dist)
     return substitutions
 
 
-def add_id_col(df: pd.DataFrame, col_name="id"):
+def add_id_col(df: pd.DataFrame, col_name="mut_id"):
     """ add index column at first position """
     df = df.copy()
     columns = list(df.columns)
@@ -77,17 +78,11 @@ def add_id_col(df: pd.DataFrame, col_name="id"):
 @click.option("--tree", required=True, help="path to tree in newick format")
 def main(input_table: str, out_table: str, tree: str):
     df = pd.read_csv(input_table)
-    df = add_dist2terminals(df, tree)
+    dnd = read_tree(tree)
+    df = add_dist2root(df, dnd)
     df = add_id_col(df)
     df.to_csv(out_table, index=None)
 
 
-# if __name__ == "__main__":
-#     main()
-
-# df = pd.read_csv("./")
-# df = add_dist2terminals(df, tree)
-
-tree_path = "./data/mulal.filtered.fasta.prank.anc.dnd"
-tree = read_tree(tree_path)
-add_dist2root(None, tree_path)
+if __name__ == "__main__":
+    main()
