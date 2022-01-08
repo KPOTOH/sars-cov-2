@@ -9,12 +9,14 @@ import sys
 
 import tqdm
 
+from utils import read_fasta_generator
+
 MIN_SEQ_LEN = 29001
 PATH_TO_NAMES = "data/gisaid/allowable_names.txt"
 
 known_seq_hashes = set()
 known_names = set()
-base_seq_set = {'\n', 'A', 'C', 'G', 'T'}
+BASE_CHARSET = {'\n', 'A', 'C', 'G', 'T'}
 
 
 def read_allowable_names(path):
@@ -29,24 +31,7 @@ def read_allowable_names(path):
 allowable_names = read_allowable_names(PATH_TO_NAMES)
 
 
-def read_fasta_generator(filepath):
-    """read fasta without deleting '\n' from line ends to write that
-    in the next step
-    """
-    with open(filepath) as fin:
-        seq = header = ''
-        for line in fin:
-            if line.startswith(">"):
-                if seq != '':
-                    yield header, seq
-                header = line
-                seq = ''
-            else:
-                seq += line
-        yield header, seq
-
-
-def filter_NNN_and_dublicates_and_write(input_filepath, fout):
+def filter_NNN_and_dublicates_and_write(input_filepath, fout, drop_N=True):
     for header, seq in read_fasta_generator(input_filepath):
         # print(header)
         seq_name = header.strip(">\n")
@@ -54,9 +39,10 @@ def filter_NNN_and_dublicates_and_write(input_filepath, fout):
 
         if seq_name not in allowable_names:
             continue
-        # if "N" in seq:
-        if set(seq) != base_seq_set:
-            continue
+        if drop_N:
+            for char in seq:
+                if char not in BASE_CHARSET:
+                    continue
         if len(seq.replace('\n', '')) < MIN_SEQ_LEN:
             continue
         if seq_name in known_names or seq_hash in known_seq_hashes:

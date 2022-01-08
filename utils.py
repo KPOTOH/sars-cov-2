@@ -33,12 +33,12 @@ def setup_logging():
         logging.config.dictConfig(config)
 
 
-def read_fasta_generator(filepath: str):
+def read_fasta_generator(filepath):
     """read fasta without deleting '\n' from line ends to write that
     in the next step
     """
     with open(filepath) as fin:
-        seq = ''
+        seq = header = ''
         for line in fin:
             if line.startswith(">"):
                 if seq != '':
@@ -123,6 +123,7 @@ def release_mutations_from_two_seqs(parent_seq: str, child_seq: str) -> list:
         "input strings must be str-type"
     )
     start_pos, stop_pos = trim_two_seqs(parent_seq, child_seq)
+    assert stop_pos - start_pos > 25000  # TODO check доп проверка того, чтоб секи были нормальные
 
     mutations = []
     for pos in range(start_pos, stop_pos):

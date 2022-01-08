@@ -19,16 +19,16 @@ import click
 from ete3 import PhyloTree
 import pandas as pd
 
-from src.utils import node_parent, FastaStorage, release_mutations_from_two_seqs
+from utils import node_parent, FastaStorage, release_mutations_from_two_seqs
 
 
-def get_mutations(node, stor: FastaStorage) -> tuple:
+def get_mutations(node, storage: FastaStorage) -> tuple:
     parent = node_parent(node)
     if parent is None:
         print("WoW", file=sys.stderr)
         return
-    seq_of_parent = stor.get_sequence(parent.name)
-    seq_of_child = stor.get_sequence(node.name)
+    seq_of_parent = storage.get_sequence(parent.name)
+    seq_of_child = storage.get_sequence(node.name)
     assert len(seq_of_child) == len(seq_of_parent), (
         "parent and child seq lenghts aren't equal"
     )
