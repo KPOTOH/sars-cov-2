@@ -1,19 +1,25 @@
 from setuptools import find_packages, setup
 
+extra_index_urls = []
+packages = []
+
+with open("requirements.txt", encoding="utf-8") as file:
+    for line in map(str.strip, file):
+        if line:
+            if line.startswith("-f"):
+                extra_index_urls.append(line.split()[1])
+            else:
+                packages.append(line)
+
+
 setup(
     name="sars_processing",
+    version="0.0.2",
     packages=find_packages(),
-    version="0.1.0",
-    description="Process sars-cov-2 sequences from gisaid and get mutations from builded phylogenetic tree",
-    author="Bogdan Efimenko",
-    install_requires=[
-        "matplotlib==3.4.3",
-        "numpy==1.21.2",
-        "pandas==1.3.4",
-        "biopython==1.79",
-        "tqdm==4.62.3",
-        "ete3==3.1.2",
-        "click==8.0.3",
-    ],
+    description="Process sars-cov-2 full genome sequences and get mutations from builded phylogenetic tree",
+    author="kpotoh",
     license="MIT",
+    install_requires=packages,
+    dependency_links=extra_index_urls,
+    python_requires=">=3.8",
 )

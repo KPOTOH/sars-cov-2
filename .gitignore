@@ -6,4 +6,5 @@ src/parser/chromedriver
 env*
 *.ipynb_checkpoints
 sars_processing.egg-info
-*/__pycache__
+*__pycache__
+

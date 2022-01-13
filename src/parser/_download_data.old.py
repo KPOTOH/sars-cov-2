@@ -1,29 +1,29 @@
 #!/usr/bin/env python3
-
-import datetime
+"""
+this script must work but it's old version with some shit
+"""
 import os
 import re
+from multiprocessing import Process
 from time import sleep
-from typing import Set, Iterable
 
-import click
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
+import datetime
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium import webdriver
 
 from base import Parser
 
 GISAID_URL = "https://www.gisaid.org/"
-ACCESS_FILE_PATH = "./src/parser/access_file.txt"
-LAST_IDX_PATH = "./src/parser/last.id"
-PATH_TO_ACCESSION_NUMBERS = "./data/Accession_Numbers_omicron_2022_01_13.csv"
+ACCESS_FILE_PATH = "./access_file.txt"
+LAST_IDX_PATH = "./last.id"
 
 START_IDX = "EPI_ISL_1044108"
-# LAST_IDX =  "EPI_ISL_5144811"
+LAST_IDX =  "EPI_ISL_5144811"
 
 SEQ_AMOUNT = 2000
 INSERT_CHANK_SIZE=2000
@@ -160,7 +160,7 @@ class GisaidParser(Parser):
                 field.send_keys(chank)
             assert ''.join(splitted) == text
 
-    def wait_spinners(self, timeout=120, poll_frequency=1):
+    def wait_spinners(self, timeout=90, poll_frequency=1):
         sleep(1)
         wait = WebDriverWait(self.driver, timeout, poll_frequency)
         base_spinner = EC.invisibility_of_element_located((By.CLASS_NAME, 'sys_dt_spinner'))
@@ -173,20 +173,16 @@ class GisaidParser(Parser):
         checkbox = table_header.find_element_by_tag_name("input")
         checkbox.click()
 
-    def download_process(self, augur=True):
+    def download_process(self):
         total = self.get_total_number()
-        max_amount = 5000 if augur else 10000
-        assert total <= max_amount, f"Number of choosen records ({total}) > {max_amount}"
+        assert total <= 5000, f"Number of choosen records ({total}) > 5000"
         iframe = self.find_elem(".sys-overlay-style")
         self.driver.switch_to.frame(iframe)
         clickables = self.find_elem(".sys-event-hook", many=True)
-        if augur:
-            clickables[0].click()  # click radio "Input for the Augur pipeline"
-            self.wait_spinners()
-            clickables = self.find_elem(".sys-event-hook", many=True) # update frame
-            clickables[3].click()  # click Download button
-        else:
-            clickables[4].click()  # click Download button
+        clickables[0].click()  # click radio "Input for the Augur pipeline"
+        self.wait_spinners()
+        clickables = self.find_elem(".sys-event-hook", many=True) # update frame
+        clickables[3].click()  # click Download button
 
         self.driver.switch_to.default_content()
         self.wait_spinners()
@@ -217,56 +213,28 @@ def num_from_idx(idx):
     return int(re.search('EPI_ISL_(\d+)', idx).groups()[0])
 
 
-def form_accertion_indexes(first_idx: str, stop_idx: str, amount: int, exclude: Iterable = None):
+def accertion_idx(first_idx="EPI_ISL_402119", amount=500, exclude=None):
     exclude = exclude or set()
     if not isinstance(exclude, set):
         exclude = set(exclude)
-
     fnum = num_from_idx(first_idx)
     collection = []
     for x in range(fnum, fnum + amount):
         idx = f"EPI_ISL_{x}"
         if idx not in exclude:
             collection.append(idx)
-        if idx == stop_idx:
+        if idx == LAST_IDX:
             break
     nxt_idx = f"EPI_ISL_{x + 1}"
     return ",".join(collection), nxt_idx
 
 
-def idx_iterator(start_idx, stop_idx, amount: int):
-    last_idx_num = num_from_idx(stop_idx)
-    while num_from_idx(start_idx) < last_idx_num:
-        indexes, nxt_idx = form_accertion_indexes(start_idx, stop_idx, amount)
-        yield indexes, start_idx
-        start_idx = nxt_idx
-
-
-def read_accession_numbers(path: str) -> Set[str]:
-    indexes = set()
-    with open(path) as fin:
-        for line in fin:
-            indexes.add(line.rstrip())
-    return indexes
-
-
-def idx_iterator_from_file(records: Set[str], amount: int):
-    last_idx = read_last_idx()
-    pass_first_recs = last_idx in records
-
-    records: list = sorted(records)
-    init_rec_id = records.index(last_idx) if pass_first_recs else 0
-    start_idx = records[init_rec_id]
-
-    indexes = []
-    for i in range(init_rec_id, len(records)):
-        indexes.append(records[i])
-        if len(indexes) == amount:
-            indexes_str = ",".join(indexes)
-            yield indexes_str, start_idx
-            
-            indexes = []
-            start_idx = records[i + 1]
+def idx_iterator(cur_idx='EPI_ISL_573608', amount=500):
+    last_idx_num = num_from_idx(LAST_IDX)
+    while num_from_idx(cur_idx) < last_idx_num:
+        indexes, nxt_idx = accertion_idx(cur_idx, amount)
+        yield indexes, cur_idx
+        cur_idx = nxt_idx
 
 
 def start_spider():
@@ -277,8 +245,8 @@ def start_spider():
     return spider
 
 
-def parsing_step(spider: GisaidParser, indexes, insert_chank_size, augur=True):
-    spider.insert_fulltext_search(indexes, insert_chank_size)
+def parsing_step(spider, indexes):
+    spider.insert_fulltext_search(indexes, INSERT_CHANK_SIZE)
     # spider.wait_total_change()
     spider.wait_spinners()
     sleep(5)
@@ -290,7 +258,7 @@ def parsing_step(spider: GisaidParser, indexes, insert_chank_size, augur=True):
     spider.button_click('download', fulltext_mode=True)
     spider.wait_spinners()
     
-    spider.download_process(augur)
+    spider.download_process()
     sleep(1)
     spider.all_checkboxes_click()
     spider.wait_spinners()
@@ -298,32 +266,16 @@ def parsing_step(spider: GisaidParser, indexes, insert_chank_size, augur=True):
     spider.wait_spinners()
 
 
-@click.command("gisaid-parser")
-@click.option("-a", "--accession_numbers", default=None, type=click.Path(exists=True), help="Path to csv file with Accession Numbers")
-@click.option("-1", "--start-idx", default=None, help="If need to download sequences without filtration, pass start idx")
-@click.option("-2", "--stop-idx", default=None, help="If need to download sequences without filtration, pass stop idx")
-@click.option("--seq-amount", default=SEQ_AMOUNT, type=int, show_default=True, help="Number of seqs to download")
-@click.option("--insert-chank-size", default=INSERT_CHANK_SIZE, show_default=True, help="Number of characters to insert into fulltext field at once")
-@click.option("--augur", is_flag=True, help="Format of output for Augur pipeline (included metadata) [bool]")
-def main(
-        accession_numbers: str, 
-        start_idx: str, stop_idx: str, 
-        seq_amount: int, insert_chank_size: int, augur: bool):
-
-    if accession_numbers is not None:
-        indexes_collection = read_accession_numbers(accession_numbers)
-        indexes_loader = idx_iterator_from_file(indexes_collection, seq_amount)
-    else:
-        start_idx = start_idx or read_last_idx()
-        assert stop_idx is not None, "start and stop index must be in arguments"
-        indexes_loader = idx_iterator(start_idx, stop_idx, seq_amount)
-
+def main():
+    start_idx = read_last_idx()
     spider = start_spider()
+    indexes_loader = idx_iterator(start_idx, SEQ_AMOUNT)
+
     for indexes, cur_idx in indexes_loader:
         write_last_idx(cur_idx)
         while True:
             try:
-                parsing_step(spider, indexes, insert_chank_size, augur)
+                parsing_step(spider, indexes)
                 print(f"Done: {cur_idx}")
                 break
             except Exception as e:
@@ -334,6 +286,44 @@ def main(
                 del spider
                 spider = start_spider()
 
+
+
+def meta_parsing_step(spiders, spid, indexes, cur_idx):
+    spider = spiders[spid]
+    while True:
+        try:
+            parsing_step(spider, indexes)
+            print(f"Done: {cur_idx}")
+            break
+        except Exception as e:
+            print(f"Failed: {cur_idx}")
+            print(e)
+            print("Restart spider\n")
+            spider.close()
+            del spider
+            spider = start_spider()
+            spiders[spid] = spider  #change list of spiders
+
+
+def main_milti(n_threads: int):
+    """http://python-3.ru/page/multiprocessing"""
+    start_idx = START_IDX
+    indexes_loader = idx_iterator(start_idx, 500)
+    spiders = [start_spider() for _ in range(n_threads)]
+    while True:
+        processes = []
+        for spid in range(n_threads):
+            indexes, _cur_idx = next(indexes_loader)
+            proc = Process(
+                target=meta_parsing_step, 
+                args=(spiders, spid, indexes, _cur_idx),
+            )
+            processes.append(proc)
+            proc.start()
+        
+        for proc in processes:
+            proc.join()
+        
 
 if __name__ == "__main__":
     main()
