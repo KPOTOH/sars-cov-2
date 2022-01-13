@@ -6,7 +6,7 @@ from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 from tqdm import tqdm
 
-from src.utils import count_two_seqs_diff
+from utils import count_two_seqs_diff
 
 PATH_TO_MULAL_IN = "./data/mulal.fasta"
 # PATH_TO_MULAL_OUT = "./data/mulal.filtered.fasta"
