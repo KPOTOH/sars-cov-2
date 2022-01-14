@@ -7,11 +7,8 @@ from time import sleep
 from typing import Set, Iterable
 
 import click
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -267,6 +264,9 @@ def idx_iterator_from_file(records: Set[str], amount: int):
             
             indexes = []
             start_idx = records[i + 1]
+    
+    indexes_str = ",".join(indexes)
+    yield indexes_str, start_idx
 
 
 def start_spider():
@@ -296,6 +296,7 @@ def parsing_step(spider: GisaidParser, indexes, insert_chank_size, augur=True):
     spider.wait_spinners()
     spider.insert_fulltext_search()  # clear fulltext field
     spider.wait_spinners()
+    sleep(11)
 
 
 @click.command("gisaid-parser")
@@ -318,11 +319,14 @@ def main(
         assert stop_idx is not None, "start and stop index must be in arguments"
         indexes_loader = idx_iterator(start_idx, stop_idx, seq_amount)
 
-    spider = start_spider()
+    start_new_spider = True
     for indexes, cur_idx in indexes_loader:
         write_last_idx(cur_idx)
         while True:
             try:
+                if start_new_spider:
+                    spider = start_spider()
+                    start_new_spider = False
                 parsing_step(spider, indexes, insert_chank_size, augur)
                 print(f"Done: {cur_idx}")
                 break
@@ -332,7 +336,7 @@ def main(
                 print("Restart spider\n")
                 spider.close()
                 del spider
-                spider = start_spider()
+                start_new_spider = True
 
 
 if __name__ == "__main__":

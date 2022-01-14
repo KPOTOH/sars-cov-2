@@ -4,7 +4,7 @@ from ete3 import PhyloTree
 import tqdm
 from queue import Queue
 
-from src.utils import node_parent
+from utils import node_parent
 
 
 def read_tree(path: str, frmt=1) -> PhyloTree:
@@ -57,7 +57,7 @@ def add_dist2root(substitutions: pd.DataFrame, tree: PhyloTree) -> pd.DataFrame:
     assert len(topology_dist) == len(tree.get_descendants()) + 1
 
     substitutions = substitutions.copy()
-    substitutions['phylo_dist'] = substitutions.child_node.map(phylo_dist)
+    # substitutions['phylo_dist'] = substitutions.child_node.map(phylo_dist)
     substitutions['topology_dist'] = substitutions.child_node.map(topology_dist)
     return substitutions
 
