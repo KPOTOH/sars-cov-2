@@ -21,3 +21,9 @@ devtools::install_github("nicolaroberts/hdp", build_vignettes = FALSE, dependenc
 #   rmarkdown,
 #   BiocStyle,
 #   devtools
+
+
+library("hdp")
+
+hdp
+
