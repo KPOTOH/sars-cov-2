@@ -8,7 +8,6 @@ import statsmodels.api as sm
 
 PATH_TO_MUTSPEC = "/home/mr/Sars_Cov_2_MutSpec/Sars_Cov_2/new_data/data_obtained/07.MutSpec12_ForFullGenome.csv"
 COLS = ["NucSubst", "ExpFr", "ObsFr", "ObsToExp"]
-NUCLEOTIDES = list("ACGU")
 
 directional_pairs = [
     ("A>C", "C>A"),
@@ -49,18 +48,19 @@ def binom_testing(
     data = []
     for mut1, mut2 in pairs:
         n1, n2 = round(mut_num[mut1]), round(mut_num[mut2])
+        ratio = n1 / n2
         res = scipy.stats.binomtest(n1, n1 + n2, p=0.5)
         pval = res.pvalue
-        row = (mut1, mut2, pval) if label is None else (
-            label, mut1, mut2, pval)
+        row = (mut1, mut2, ratio, pval) if label is None else (
+            label, mut1, mut2, ratio, pval)
         data.append(row)
-    cols = ["mut1", "mut2", "pval"] if label is None else [
-        "label", "mut1", "mut2", "pval"]
+    base_cols = ["mut1", "mut2", "ratio", "pval"]
+    cols = base_cols if label is None else ["label"] + base_cols
     data = pd.DataFrame(data, columns=cols)
 
     _, qval, _, _ = sm.stats.multipletests(
         data["pval"].values, method="fdr_bh")  # adjust pval
-    data["qval"] = qval
+    data["pval_adj"] = qval
     data["asterics"] = asterics_for_vector(qval)
     return data
 
@@ -68,13 +68,14 @@ def binom_testing(
 def main():
     parser = argparse.ArgumentParser(
         description="Do statistics (binomial test) for 12-comp. mutspec distinct values.\n"
-        "For each pair of reciprocal and directional substitutions count significance of its difference"
+        "For each pair of reciprocal and directional substitutions count significance of its difference."
     )
     parser.add_argument("inp", type=argparse.FileType("r"),
-                        help="path to input MutSpec table")
+                        help="Path to input 16-comp MutSpec table. Required columns [{}, {}, {}, {}]"
+                        .format(*COLS))
     parser.add_argument(
         "out", default=None, nargs="?", type=argparse.FileType("w"),
-        help="path to output csv with statistics, (by default write file in the same dir: `inp`.compared.csv)"
+        help="Path to output csv with statistics, (by default write file in the same dir: `inp`.compared.csv)"
     )
     args = parser.parse_args()
 
@@ -85,6 +86,9 @@ def main():
         f"output file: {out if isinstance(out, str) else out.name}", file=sys.stderr)
 
     mutspec = pd.read_csv(inp, usecols=COLS)
+    for c in COLS:
+        assert c in mutspec.columns, f"Column {c} required in MutSpec table"
+
     mut_num = dict(zip(mutspec.NucSubst, mutspec.ObsToExp))
 
     dirp = binom_testing(directional_pairs, mut_num, "directional")
@@ -92,6 +96,7 @@ def main():
 
     compared = pd.concat([dirp, recp], axis=0).reset_index(drop=True)
     compared.to_csv(out, index=None)
+    print("\nDone", file=sys.stderr)
 
 
 if __name__ == "__main__":
