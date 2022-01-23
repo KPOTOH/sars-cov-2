@@ -9,3 +9,4 @@ sars_processing.egg-info
 *__pycache__
 
 .Rproj.user
+nb/vcftest
