@@ -1,5 +1,5 @@
 """
-format mutspec table to such style for SigProfilerExtractor
+format mutspec table to such style for SigProfilerExtractor:
 
 Mutation Types      Sample1 Sample2
 A[C>A]A             58      74
@@ -10,16 +10,14 @@ A[C>A]T             37      64
 C>A, C>G, C>T, T>A, T>C, T>G
 """
 
-import numpy as np
+import random
 import pandas as pd
 
 PATH_TO_MUTSPEC_192 = "./data/share/07.All_MutSpec192_ForFullGenome.csv"
+PATH_TO_OUT = "./data/share/mutspec_96_all.tsv"
+COLS = ["NucSubst" ,"ObsFr" ,"Colour" ,"ExpFr" ,"ObsToExp" ,"Context"]
 nucs_that_mutated = {"C", "U"}
-
 translator = str.maketrans("AUGC", "TACG")
-
-mutspec192 = pd.read_csv(PATH_TO_MUTSPEC_192)
-print(mutspec192)
 
 
 def collapse_mutspec(nuc_subst: str):
@@ -41,8 +39,28 @@ def collapse_mutspec(nuc_subst: str):
     return new_style_subst
 
 
-mut_types = mutspec192.NucSubst.apply(collapse_mutspec)
-print(mut_types)
+def process_one_mutspec(path: str, label=None, rounding=True):
+    label = label or "Sample_{:02}".format(random.randint(1, 99))
+
+    mutspec192 = pd.read_csv(PATH_TO_MUTSPEC_192, usecols=COLS)
+    mutspec192["NucSubst"] = mutspec192.NucSubst.apply(collapse_mutspec)
+
+    mutspec96 = mutspec192.groupby("NucSubst").ObsToExp.sum().reset_index()
+    new_style_mutspec = mutspec96[["NucSubst", "ObsToExp"]]
+    new_style_mutspec.columns = ["Mutation Types", label]
+    if rounding:
+        new_style_mutspec[label] = new_style_mutspec[label].round(0).astype(int)
+    return new_style_mutspec
 
 
-# mutspec96 = pd.DataFrame()
+def write_new_style(data: pd.DataFrame, path):
+    data.to_csv(path, index=None, sep="\t")
+
+
+def main():
+    m = process_one_mutspec(PATH_TO_MUTSPEC_192, "Sars_all")
+    write_new_style(m, PATH_TO_OUT)
+
+
+if __name__ == "__main__":
+    main()
