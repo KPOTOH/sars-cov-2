@@ -9,27 +9,24 @@ PATH_TO_FASTA = "./data/gisaid_omicron_13-01-22.fasta"
 PATH_TO_OUT = "./data/gisaid_omicron_13-01-22.filtered.fasta"
 
 MIN_SEQ_LEN = 29001
+N_SHARE_CUTOFF = 0.01
 
 
 def main():
     sequences = SeqIO.parse(PATH_TO_FASTA, "fasta")
-    n_contain_N = 0
-    n_less_min = 0
-    n_amounts = []
-
-    rec: SeqRecord = None
+    ndrops = 0
     with open(PATH_TO_OUT, "w") as fout:
         for rec in tqdm(sequences, total=262000):
-            seq = rec.seq
-            n_contain_N += int("N" in seq)
-            n_less_min += int(len(seq) < MIN_SEQ_LEN)
-            n_amounts.append(seq.count("N"))
+            seq = str(rec.seq)
+            n_count = seq.count("N")
+            lenght = len(seq)
+            if lenght < MIN_SEQ_LEN or n_count / lenght > N_SHARE_CUTOFF:
+                ndrops += 1
+                continue
 
+            SeqIO.write(rec, fout, "fasta")
 
-            # SeqIO.write(rec, fout, "fasta")
-
-    print(n_less_min, n_contain_N)
-    print(pd.Series(n_amounts).value_counts().sort_index())
+    print("Dropped {} seqs".format(ndrops))
 
 
 if __name__ == "__main__":
