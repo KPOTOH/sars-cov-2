@@ -1,7 +1,5 @@
 from collections import defaultdict
 import json
-
-import numpy as np
 import pandas as pd
 
 PATH_TO_HUMAN_COUNTS = "./data/signatures/GRCh37_codon_counts.json"
@@ -27,10 +25,8 @@ def load_reference_sig(path: str):
     return df
 
 
-def main():
-    triplets = load_triplet_counts(PATH_TO_HUMAN_COUNTS)
-    signatures = load_reference_sig(PATH_TO_SIGNATURES)
-
+def normalize(triplets, signatures):
+    assert "Type" in signatures.columns
     ref_triplet = signatures.Type.apply(lambda s: "".join([s[0], s[2], s[-1]]))
     counts_raw = ref_triplet.map(triplets)
     counts = counts_raw / counts_raw.sum()
@@ -39,8 +35,15 @@ def main():
     signatures_normed = signatures.div(counts.values, axis=0)
     signatures_normed = signatures_normed.div(
         signatures_normed.sum(axis=1).values, axis=0)
+    return signatures_normed.reset_index()
 
-    signatures_normed.reset_index().to_csv(PATH_TO_SIGNATURES_NORMALIZED, index=None, sep="\t")
+
+def main():
+    triplets = load_triplet_counts(PATH_TO_HUMAN_COUNTS)
+    signatures = load_reference_sig(PATH_TO_SIGNATURES)
+    
+    signatures_normed = normalize(triplets, signatures)
+    signatures_normed.to_csv(PATH_TO_SIGNATURES_NORMALIZED, index=None, sep="\t")
 
 
 if __name__ == "__main__":
