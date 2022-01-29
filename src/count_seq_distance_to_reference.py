@@ -13,8 +13,8 @@ import tqdm
 
 from utils import release_mutations_from_two_seqs
 
-PATH_TO_DATA = '/media/mr/const1/projects/COVID19/data/'
-PATH_TO_MULAL = PATH_TO_DATA + 'mulal_gisaid_2021-01-22.filtered.fasta'
+PATH_TO_DATA = '../data/omicron/'
+PATH_TO_MULAL = PATH_TO_DATA + 'mulal.filtered.fasta'
 PATH_TO_DISTRIBUTION = PATH_TO_DATA + 'mutation_number_distribution.json'
 PATH_TO_DISTRIBUTION_DF = '../data/mutation_number_distribution.csv'
 

@@ -138,7 +138,7 @@ def release_mutations_from_two_seqs(parent_seq: str, child_seq: str) -> list:
     return mutations
 
 
-def count_two_seqs_diff(parent_seq: str, child_seq: str):
+def count_two_seqs_diff(parent_seq: str, child_seq: str) -> int:
     start_pos, stop_pos = trim_two_seqs(parent_seq, child_seq)
     diff = 0
     for pos in range(start_pos, stop_pos):
