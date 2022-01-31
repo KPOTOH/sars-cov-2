@@ -52,6 +52,7 @@ def process_one_mut(mut: List[tuple]) -> float:
         Pos = pos + 1
 
     return 0.0 
+    
 
 def check_mutations(muts):
     ref_annot = load_ref_annot(PATH_TO_REF)
