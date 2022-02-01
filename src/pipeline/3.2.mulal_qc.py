@@ -12,7 +12,7 @@ MAX_MUT_NUM = 80
 DROP_PROB = 0.82
 MAX_DEL_FRACTION = 1 / 30
 
-NSEQS = 131938  # number of records in input fasta
+NSEQS = 134000  # number of records in input fasta
 
 
 def get_mut_num(rec: SeqRecord, ref: SeqRecord) -> int:

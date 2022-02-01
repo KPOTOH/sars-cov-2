@@ -20,3 +20,6 @@ def main(input_mutspec, outdir, max_signatures, threads):
 
 if __name__ == "__main__":
     main()
+
+
+# TODO add custom database selection
