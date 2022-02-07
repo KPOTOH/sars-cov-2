@@ -1,6 +1,7 @@
 # on ubuntu
 # sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libgit2-dev
 
+renv::init(bioconductor = TRUE)
 
 install.packages("devtools")
 
@@ -11,7 +12,7 @@ BiocManager::install("BiocStyle")
 BiocManager::install("SomaticCancerAlterations")
 
 
-devtools::install_github("nicolaroberts/hdp", build_vignettes = FALSE, dependencies = TRUE)
+devtools::install_github("nicolaroberts/hdp", build_vignettes = TRUE, dependencies = TRUE, force = TRUE)
 
 # Suggests:
 #   testthat,
