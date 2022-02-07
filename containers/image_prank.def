@@ -1,21 +1,17 @@
-BootStrap: library
-From: ubuntu:18.04
+Bootstrap: library
+From: debian:9
 
 %post
-  # Get the actual dependencies
-  apt-get update && apt-get upgrade -y
-  apt-get install --no-install-recommends --yes software-properties-common
-  add-apt-repository universe
-  apt-get update && apt-get upgrade -y
+    apt-get install --no-install-recommends --yes wget
 
-  apt-get install --no-install-recommends --yes prank
-
-  # Cleanup build packages
-  apt-get remove --yes software-properties-common
-  rm -rf /var/lib/apt/lists/*
+    cd /opt
+    wget http://wasabiapp.org/download/prank/prank.linux64.170427.tgz
+    tar -xvzf prank.linux64.170427.tgz
+    
+    chmod -R 755 /opt/prank
 
 %environment
-  export LC_ALL=C
+  export PATH=$PATH:/opt/prank/bin
 
 %test
   test_command () {
@@ -26,7 +22,6 @@ From: ubuntu:18.04
   }
 
   test_command bash
-  test_command ps
   test_command prank
 
   if [ -n "$FAILED_TESTS" ]; then
@@ -34,4 +29,4 @@ From: ubuntu:18.04
   fi
 
 %runscript
-  prank
+  prank "$@"
