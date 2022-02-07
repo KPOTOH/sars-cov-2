@@ -1,0 +1,37 @@
+BootStrap: library
+From: ubuntu:18.04
+
+%post
+  # Get the actual dependencies
+  apt-get update && apt-get upgrade -y
+  apt-get install --no-install-recommends --yes software-properties-common
+  add-apt-repository universe
+  apt-get update && apt-get upgrade -y
+
+  apt-get install --no-install-recommends --yes prank
+
+  # Cleanup build packages
+  apt-get remove --yes software-properties-common
+  rm -rf /var/lib/apt/lists/*
+
+%environment
+  export LC_ALL=C
+
+%test
+  test_command () {
+    if ! command -v "${1}"; then
+      echo "command ${1} not found!"
+      export FAILED_TESTS=1
+    fi
+  }
+
+  test_command bash
+  test_command ps
+  test_command prank
+
+  if [ -n "$FAILED_TESTS" ]; then
+    exit 1
+  fi
+
+%runscript
+  prank
