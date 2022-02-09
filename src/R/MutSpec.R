@@ -4,7 +4,7 @@
 library('ggplot2')
 library(LaplacesDemon)
 
-setwd("~/COVID19/")
+setwd("~/sars-cov-2/")
 rm(list=ls(all=TRUE))
 
 AddNormedFr <- function(df){
@@ -16,7 +16,12 @@ AddNormedFr <- function(df){
   return(df)
 }
 
-nxt_mutspec <- read.csv('data/MutSpecTables/07.MutSpec12_Nextstrain_FF.csv')
+bootstraping = function(df){
+  return(df[sample(nrow(df), replace = TRUE),])
+}
+
+
+nxt_mutspec <- read.csv('data/share/MutSpecTables/07.MutSpec12_Nextstrain_FF.csv')
 full_mutspec <- read.csv('data/MutSpecTables/07.MutSpec12_ForAllPos.csv')
 stem_mutspec <- read.csv('data/MutSpecTables/07.MutSpec12_ForStem.csv')
 free_mutspec <- read.csv('data/MutSpecTables/07.MutSpec12_ForFree.csv')
