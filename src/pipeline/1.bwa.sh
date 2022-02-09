@@ -1,4 +1,5 @@
 #!/bin/bash
+# CAUTION! sequence names should not used spaces
 #USAGE: ./1.bwa.sh pathToBwa pathToSamtools fastaReference multiFastaSequesteredAndRandomized coreNumber
 #output samFile
 

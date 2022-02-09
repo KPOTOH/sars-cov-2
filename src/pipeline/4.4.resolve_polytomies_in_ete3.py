@@ -8,7 +8,7 @@ import sys
 
 
 def main():
-    assert len(sys.argv) > 1, "need arguments for processing"
+    assert len(sys.argv) > 1, "need arguments for processing\nUSAGE: ./resolve_polytomies_in_ete3.py simple_tree [resolved_tree]"
     path_to_tree = sys.argv[1]
     tree = PhyloTree(path_to_tree, format=9)
     tree.resolve_polytomy()

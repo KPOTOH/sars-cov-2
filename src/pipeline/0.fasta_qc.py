@@ -48,7 +48,7 @@ def filter_NNN_and_dublicates_and_write(input_filepath, fout, drop_N=True):
         if seq_name in known_names or seq_hash in known_seq_hashes:
             continue
 
-        fout.write(header)
+        fout.write(header.replace(" ", "_"))
         fout.write(seq)
 
         known_names.add(seq_name)
