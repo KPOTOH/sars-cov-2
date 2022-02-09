@@ -22,6 +22,9 @@ import pandas as pd
 from utils import node_parent, FastaStorage, release_mutations_from_two_seqs
 
 
+# TODO use temporary mysql database instead of storage dict 
+
+
 def get_mutations(node, storage: FastaStorage) -> tuple:
     parent = node_parent(node)
     if parent is None:

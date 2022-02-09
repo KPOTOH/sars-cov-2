@@ -41,23 +41,15 @@ def add_dist2root(substitutions: pd.DataFrame, tree: PhyloTree) -> pd.DataFrame:
     calculate distance to root from each node and assign to mutations in table;
     mutation has distance of child node of edge
     """
-    phylo_dist = dict()
     topology_dist = dict()
-    phylo_dist[tree.name] = 0
     topology_dist[tree.name] = 0
-
     for node in tqdm.tqdm(tree.iter_descendants(), total=len(tree.get_descendants())):
-        pd = tree.get_distance(node)
-        td = int(tree.get_distance(node, topology_only=True))
-       
-        phylo_dist[node.name] = pd
+        td = int(tree.get_distance(node, topology_only=True))       
         topology_dist[node.name] = td
 
-    assert len(phylo_dist) == len(tree.get_descendants()) + 1
     assert len(topology_dist) == len(tree.get_descendants()) + 1
 
     substitutions = substitutions.copy()
-    # substitutions['phylo_dist'] = substitutions.child_node.map(phylo_dist)
     substitutions['topology_dist'] = substitutions.child_node.map(topology_dist)
     return substitutions
 
@@ -72,16 +64,41 @@ def add_id_col(df: pd.DataFrame, col_name="mut_id"):
     return df
 
 
+def filter_mut(mut: pd.DataFrame) -> pd.DataFrame:
+    """
+    filter out substitutions with:
+    - deletions in context (xxXxx - x cannot be "-")
+    - unequal context (2 nucleotide upstream and downstream)
+    """
+    nessesary_cols = ["parent_nucl_context", "child_nucl_context"]
+    for col in nessesary_cols:
+        assert col in mut.columns, f"column {col} must be in mut-dataframe"
+    
+    # only ATGC in context
+    mut = mut[(~mut.parent_nucl_context.str.contains("[^acgtACGT]")) &
+              (~mut.child_nucl_context.str.contains("[^acgtACGT]"))]
+
+    # contexts of child and parent seqs must be equal
+    large_parent_context = mut.parent_nucl_context.str.slice(
+        0, 2) + mut.parent_nucl_context.str.slice(3, 5)
+    large_child_context = mut.child_nucl_context.str.slice(
+        0, 2) + mut.child_nucl_context.str.slice(3, 5)
+
+    mut = mut[large_parent_context == large_child_context]
+    return mut
+
+
 @click.command("featirizer", help="add some features to mutations table")
 @click.option("--input-table", required=True, help="path to input csv")
 @click.option("--out-table", required=True, help="path to output mutations csv")
 @click.option("--tree", required=True, help="path to tree in newick format")
 def main(input_table: str, out_table: str, tree: str):
-    df = pd.read_csv(input_table)
+    mut = pd.read_csv(input_table)
     dnd = read_tree(tree)
-    df = add_dist2root(df, dnd)
-    df = add_id_col(df)
-    df.to_csv(out_table, index=None)
+    mut = add_dist2root(mut, dnd)
+    mut = filter_mut(mut)
+    mut = add_id_col(mut)
+    mut.to_csv(out_table, index=None)
 
 
 if __name__ == "__main__":
