@@ -3,8 +3,8 @@
 
 <svg
    width="210mm"
-   height="297mm"
-   viewBox="0 0 210 297"
+   height="230mm"
+   viewBox="0 0 210 230"
    version="1.1"
    id="svg451282"
    inkscape:version="1.1.2 (1:1.1+202202050950+0a00cf5339)"
@@ -26,13 +26,14 @@
      showgrid="false"
      inkscape:zoom="1"
      inkscape:cx="385.5"
-     inkscape:cy="528"
+     inkscape:cy="368"
      inkscape:window-width="1870"
      inkscape:window-height="1043"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g55182" />
+     inkscape:current-layer="g55182"
+     height="220mm" />
   <defs
      id="defs451279">
     <clipPath
@@ -14335,9 +14336,9 @@
              xml:space="preserve"><tspan
                x="0"
                y="-1094.9612"
-               id="tspan61264">2<tspan
+               id="tspan9421">2<tspan
    style="font-size:34.555px;baseline-shift:super"
-   id="tspan61262">nd</tspan> base</tspan></text>
+   id="tspan9419">nd</tspan> base</tspan></text>
         </g>
         <path
            d="m 162,1140.48 h -3.5"
@@ -14456,10 +14457,10 @@
              id="text5026"
              xml:space="preserve"><tspan
                x="0"
-               y="38.216391"
-               id="tspan61268">1<tspan
+               y="38.216393"
+               id="tspan9425">1<tspan
    style="font-size:34.555px;baseline-shift:super"
-   id="tspan61266">st</tspan>  base</tspan></text>
+   id="tspan9423">st</tspan>  base</tspan></text>
         </g>
         <g
            id="g5028"
@@ -17732,6 +17733,23 @@
         <g
            id="g55272"
            transform="translate(290.77187,666.8625)" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-weight:normal;font-size:52.6176px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.1924;stroke-linecap:butt;stroke-linejoin:round"
+           x="-8.9398031"
+           y="259.70023"
+           id="text14221"
+           transform="scale(1,-1)"><tspan
+             sodipodi:role="line"
+             id="tspan14219"
+             style="font-size:52.6176px;stroke-width:2.1924"
+             x="-8.9398031"
+             y="259.70023">Figure 3</tspan><tspan
+             sodipodi:role="line"
+             style="font-size:52.6176px;stroke-width:2.1924"
+             x="-8.9398031"
+             y="325.47223"
+             id="tspan1024" /></text>
       </g>
     </g>
   </g>
