@@ -9,7 +9,7 @@ import statsmodels.api as sm
 PATH_TO_MUTSPEC = "/home/mr/Sars_Cov_2_MutSpec/Sars_Cov_2/new_data/data_obtained/07.MutSpec12_ForFullGenome.csv"
 COLS = ["NucSubst", "ExpFr", "ObsFr", "ObsToExp"]
 
-directional_pairs = [
+reciprocal_pairs = [
     ("A>C", "C>A"),
     ("A>G", "G>A"),
     ("A>U", "U>A"),
@@ -17,7 +17,7 @@ directional_pairs = [
     ("C>U", "U>C"),
     ("G>U", "U>G"),
 ]
-reciprocal_pairs = [
+complementary_pairs = [
     ("A>C", "U>G"),
     ("A>G", "U>C"),
     ("A>U", "U>A"),
@@ -68,7 +68,7 @@ def binom_testing(
 def main():
     parser = argparse.ArgumentParser(
         description="Do statistics (binomial test) for 12-comp. mutspec distinct values.\n"
-        "For each pair of reciprocal and directional substitutions count significance of its difference."
+        "For each pair of complementary and reciprocal substitutions count significance of its difference."
     )
     parser.add_argument("inp", type=argparse.FileType("r"),
                         help="Path to input 16-comp MutSpec table. Required columns [{}, {}, {}, {}]"
@@ -91,8 +91,8 @@ def main():
 
     mut_num = dict(zip(mutspec.NucSubst, mutspec.ObsToExp))
 
-    dirp = binom_testing(directional_pairs, mut_num, "directional")
-    recp = binom_testing(reciprocal_pairs, mut_num, "reciprocal")
+    dirp = binom_testing(reciprocal_pairs, mut_num, "reciprocal")
+    recp = binom_testing(complementary_pairs, mut_num, "complementary")
 
     compared = pd.concat([dirp, recp], axis=0).reset_index(drop=True)
     compared.to_csv(out, index=None)
