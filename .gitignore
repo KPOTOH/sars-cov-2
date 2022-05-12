@@ -10,3 +10,4 @@ sars_processing.egg-info
 
 .Rproj.user
 nb/vcftest
+!data/Simulation_Covid.csv
