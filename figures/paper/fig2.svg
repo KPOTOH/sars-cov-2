@@ -6,7 +6,7 @@
    version="1.2"
    id="svg1761"
    sodipodi:docname="fig2.svg"
-   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   inkscape:version="1.1.2 (1:1.1+202202050950+0a00cf5339)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -22,17 +22,29 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="pt"
      showgrid="false"
-     inkscape:zoom="1.0588328"
-     inkscape:cx="547.77299"
-     inkscape:cy="253.58112"
-     inkscape:window-width="1366"
-     inkscape:window-height="715"
-     inkscape:window-x="0"
-     inkscape:window-y="22"
+     inkscape:zoom="5.9896628"
+     inkscape:cx="579.16449"
+     inkscape:cy="417.13533"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="1920"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      inkscape:current-layer="g2269" />
   <defs
      id="defs50">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient6198">
+      <stop
+         style="stop-color:#4d4d4d;stop-opacity:1;"
+         offset="0"
+         id="stop6194" />
+      <stop
+         style="stop-color:#4d4d4d;stop-opacity:0;"
+         offset="1"
+         id="stop6196" />
+    </linearGradient>
     <marker
        style="overflow:visible"
        id="Arrow1Lstart"
@@ -244,6 +256,15 @@
        x2="374.78906"
        y2="275.22656"
        gradientTransform="translate(97.999962,-6)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient6198"
+       id="linearGradient6200"
+       x1="472.17377"
+       y1="301.26309"
+       x2="431.63214"
+       y2="300.95306"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <g
      id="surface169">
@@ -3691,22 +3712,22 @@
      id="g2269"
      transform="translate(0,3)">
     <path
-       style="fill:#666666;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;mix-blend-mode:normal;fill:url(#linearGradient6200);fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 448.94089,301.20785 23.70041,-16.12588 5.00312,0.003 -0.0292,26.12021 -4.97392,0.0214 h -23.70041 v -10.01871"
        id="path1831" />
     <rect
-       style="opacity:1;fill:#666666;fill-opacity:1;stroke-width:1.01403;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
-       id="rect20659"
-       width="75.729446"
-       height="10.018709"
-       x="374.78906"
-       y="301.20786" />
-    <rect
-       style="fill:#666666;fill-opacity:1;stroke-width:1.61541;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:#4d4d4d;fill-opacity:1;stroke-width:1.61541;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect20659-5"
        width="73.647781"
        height="26.144587"
        x="472.6413"
        y="285.08197" />
+    <rect
+       style="opacity:1;fill:#b3b3b3;fill-opacity:1;stroke-width:1.00486;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect20659"
+       width="74.366554"
+       height="10.018709"
+       x="374.78906"
+       y="301.20786" />
   </g>
 </svg>
