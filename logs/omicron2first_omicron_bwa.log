@@ -1,4 +1,4 @@
-Singularity> ../../src/pipeline/1.bwa.sh bwa samtools ../_ref_omicron/omicron_ref.fasta sequences.filtered.fasta 24
+Singularity> ../../scripts/pipeline/1.bwa.sh bwa samtools ../_ref_omicron/omicron_ref.fasta sequences.filtered.fasta 24
 [bwa_index] Pack FASTA... 0.00 sec
 [bwa_index] Construct BWT for the packed sequence...
 [bwa_index] 0.00 seconds elapse.

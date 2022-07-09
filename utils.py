@@ -23,7 +23,7 @@ SUBSTITUTIONS_PATH = "../data/overall_mutations_with_context.json"
 SEC_STRUCT_PATH_v1 = "../data/structure_data/SARSCoV2-RNA.ss"
 SEC_STRUCT_PATH_from_site = "../data/structure_data/SARSCoV2-RNA_from_site_0based.ss"
 
-DEFAULT_LOGGING_CONFIG_FILEPATH = "./src/logging.conf.yml"
+DEFAULT_LOGGING_CONFIG_FILEPATH = "./scripts/logging.conf.yml"
 
 
 def setup_logging():

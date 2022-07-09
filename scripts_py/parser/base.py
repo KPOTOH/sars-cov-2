@@ -5,8 +5,8 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
 
-FIREFOXDRIVER_PATH = "./src/parser/geckodriver"
-CHROMEDRIVER_PATH = "./src/parser/chromedriver"
+FIREFOXDRIVER_PATH = "./scripts/parser/geckodriver"
+CHROMEDRIVER_PATH = "./scripts/parser/chromedriver"
 
 
 class Parser():

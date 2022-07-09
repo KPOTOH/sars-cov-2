@@ -15,8 +15,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from base import Parser
 
 GISAID_URL = "https://www.gisaid.org/"
-ACCESS_FILE_PATH = "./src/parser/access_file.txt"
-LAST_IDX_PATH = "./src/parser/last.id"
+ACCESS_FILE_PATH = "./scripts/parser/access_file.txt"
+LAST_IDX_PATH = "./scripts/parser/last.id"
 PATH_TO_ACCESSION_NUMBERS = "./data/Accession_Numbers_omicron_2022_01_13.csv"
 
 START_IDX = "EPI_ISL_1044108"

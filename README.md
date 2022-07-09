@@ -17,5 +17,3 @@ pip install -e .
 - life circle [paper](https://www.nature.com/articles/s41579-020-00468-6)
 - ststistics decision tree [pingouin](https://pingouin-stats.org/guidelines.html?highlight=krus#non-parametric)
 - [sars-cov-2 variants](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1036501/Technical_Briefing_29_published_26_November_2021.pdf)
-- []()
-
